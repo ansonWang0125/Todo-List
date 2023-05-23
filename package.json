@@ -1,0 +1,24 @@
+{
+  "name": "todo-list",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd frontend && yarn && yarn start",
+    "server": "cd backend && yarn && yarn start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ansonWang0125/Todo-List.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ansonWang0125/Todo-List/issues"
+  },
+  "homepage": "https://github.com/ansonWang0125/Todo-List#readme",
+  "dependencies": {
+    "create-react-app": "^5.0.1"
+  }
+}
