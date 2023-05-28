@@ -1,7 +1,7 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 
 const defineCommentModel = (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
-  const User = sequelize.define<Model<any>>('comments', {
+  const Comment = sequelize.define<Model<any>>('Comments', {
     content: {
       type: dataTypes.STRING,
       allowNull: false,
@@ -13,14 +13,9 @@ const defineCommentModel = (sequelize: Sequelize, dataTypes: typeof DataTypes) =
         allowNull: true,
         unique: false,
       },
-    updateTime: {
-      type: dataTypes.DATE,
-      allowNull: true,
-      unique: false,
-    },
   }, { timestamps: false });
 
-  return User;
+  return Comment;
 };
 
 export default defineCommentModel;

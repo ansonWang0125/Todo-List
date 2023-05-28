@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,26 +10,80 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import EnhancedTableHead from './tabelHead/EnhancedTableHead';
 import EnhancedTableToolbar from './toolBar/EnhancedToolBar';
-import { rows } from './data/rows';
+// import { todo, done } from './data/rows';
 import { stableSort, getComparator } from './sortFunction/sortFunction';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import IconButton from '@mui/material/IconButton';
+// import EditRoundedIcon from '@mui/icons-material/EditRounded';
+// import IconButton from '@mui/material/IconButton';
+import { useUserContext } from '../../Context/UserCtx';
+import { useStateContext } from '../../Context/StateCtx';
+import MyDrawer from './drawer/drawer';
+import { io } from "socket.io-client";
+import { useTaskContext } from '../../Context/TaskCtx';
 
-interface Data {
-  name: string,
-  creator: string,
-  dueTime: Date,
-  createTime: Date,
-}
+const socket: any = io('http://localhost:8080'); //'http://localhost:8080'
 
 type Order = 'asc' | 'desc';
 
-export default function EnhancedTable() {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('creator');
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(7);
+interface Data {
+  taskID: number;
+  task: string;
+  creator: string;
+  createTime: Date;
+  dueTime: Date;
+  state: string;
+}
+
+export default function TodoList() {
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof Data>('creator');
+  const [selected, setSelected] = useState<readonly number[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(7);
+  const {state} = useStateContext();
+  const {todo, done} = useTaskContext()
+  const rows = state === 'todo'? todo : done;
+  const initialState = rows.length === 0 ? null : rows[0]
+  const [currRow, setCurrRow] = useState(initialState);
+  console.log(currRow)
+  const [open, setOpen] = useState(false);
+  const {user} = useUserContext();
+
+  useEffect(() => {
+    const chatroomUser = (data: any) => {
+      console.log(data);
+    }
+    socket.on('comment_users', chatroomUser);
+
+    return () => socket.off('comment_users');
+  });
+
+  const toggleDrawer =
+    (open: boolean, row: Data|null) =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+      // console.log("wtf?")
+      if (
+        event.type === 'keydown' &&
+        ((event as React.KeyboardEvent).key === 'Tab' ||
+          (event as React.KeyboardEvent).key === 'Shift')
+      ) {
+        return;
+      }
+      // console.log('before drawer: ', open)
+      if (open) {
+        console.log('join')
+        socket.emit('join_comment', {username: user, taskID: row?.taskID.toString()});
+      } else {
+        // const createdtime = Date.now();
+        console.log('leave')
+        socket.emit('get_room_members', {taskID: row?.taskID.toString()})
+        socket.emit('leave_comment', { username: user, taskID: row?.taskID.toString()});
+        socket.emit('get_room_members', {taskID: row?.taskID.toString()})
+        // socket.disconnect();
+      }
+      // socket.emit('join_comment', { user: 'John', name: 'example' });
+      // socket.emit("join_comment", '', '')
+      setOpen(open);
+    };
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -42,19 +96,20 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
+      const newSelected = rows.map((n) => n.taskID);
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
+  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    event.preventDefault();
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: readonly number[] = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -78,7 +133,7 @@ export default function EnhancedTable() {
     setPage(0);
   };
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+  const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -90,7 +145,7 @@ export default function EnhancedTable() {
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage],
+    [order, orderBy, page, rowsPerPage, rows],
   );
 
   function formatDate(date: Date): string {
@@ -99,14 +154,16 @@ export default function EnhancedTable() {
       month: '2-digit',
       day: '2-digit',
     };
+    console.log("date", date)
   
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleString('zh-TW', options).slice(0, 10);
   }
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <MyDrawer toggleDrawer={toggleDrawer} open={open} row={currRow} socket={socket}/>
+        <EnhancedTableToolbar numSelected={selected.length} selected={selected} setSelected={setSelected} socket={socket} row={currRow}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -123,23 +180,24 @@ export default function EnhancedTable() {
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.name);
+                const isItemSelected = isSelected(row.taskID);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.name)}
+                    onClick={e => {setCurrRow(row);toggleDrawer(true, row)(e)}} //setCurrRow(row);toggleDrawer(true);
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.name}
+                    key={row.taskID}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
+                        onClick={(event) => {handleClick(event, row.taskID); event.stopPropagation();}}
                         checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
@@ -152,18 +210,18 @@ export default function EnhancedTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.name}
+                      {row.task}
                     </TableCell>
                     <TableCell align="right">{row.creator}</TableCell>
                     <TableCell align="right">{formatDate(row.dueTime)}</TableCell>
                     <TableCell align="right">{formatDate(row.createTime)}</TableCell>
-                    <TableCell padding="none">
-                      <IconButton>
+                    {/* <TableCell padding="none">
+                      <IconButton onClick={()=>handleEdit(row)}>
                         <EditRoundedIcon
                           color="primary"
                         />
                       </IconButton>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}

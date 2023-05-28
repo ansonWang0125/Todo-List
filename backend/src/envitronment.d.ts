@@ -7,8 +7,8 @@ declare global {
         password: string;
         secretKey: string;
         host: string;
-        dbport: number;
-        port: number;
+        dbport: string;
+        port: string;
       }
     }
   }

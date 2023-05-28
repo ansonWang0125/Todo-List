@@ -3,13 +3,29 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { LoginContextProvider } from './Context/LoginCtx';
+import { UserContextProvider } from './Context/UserCtx';
+import { StateContextProvider } from './Context/StateCtx';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TaskContextProvider } from './Context/TaskCtx';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <UserContextProvider>
+    <LoginContextProvider>
+    <StateContextProvider>
+    <TaskContextProvider>
+      <App />
+    </TaskContextProvider>
+    </StateContextProvider>
+    </LoginContextProvider>
+    </UserContextProvider>
+    </LocalizationProvider>
   </React.StrictMode>
 );
 

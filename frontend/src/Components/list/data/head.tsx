@@ -1,8 +1,10 @@
 interface Data {
-    name: string,
-    creator: string,
-    dueTime: Date,
-    createTime: Date,
+  taskID: number;
+  task: string;
+  creator: string;
+  createTime: Date;
+  dueTime: Date;
+  state: string;
 }
 
 interface HeadCell {
@@ -13,12 +15,24 @@ interface HeadCell {
   }
   
 export const headCells: readonly HeadCell[] = [
+    // {
+    //   id: 'taskID',
+    //   numeric: false,
+    //   disablePadding: true,
+    //   label: 'TaskID',
+    // },
     {
-      id: 'name',
+      id: 'task',
       numeric: false,
       disablePadding: true,
-      label: 'TaskName',
+      label: 'Task',
     },
+    // {
+    //   id: 'state',
+    //   numeric: false,
+    //   disablePadding: true,
+    //   label: 'State',
+    // },
     {
       id: 'creator',
       numeric: false,

@@ -1,7 +1,7 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 
 const defineTaskModel = (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
-  const User = sequelize.define<Model<any>>('Tasks', {
+  const Task = sequelize.define<Model<any>>('Tasks', {
     task: {
       type: dataTypes.STRING,
       allowNull: false,
@@ -17,9 +17,14 @@ const defineTaskModel = (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
       allowNull: true,
       unique: false,
     },
+    state: {
+      type: dataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'todo'
+    }
   }, { timestamps: false });
 
-  return User;
+  return Task;
 };
 
 export default defineTaskModel;

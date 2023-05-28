@@ -4,6 +4,8 @@ import './App.css';
 import Main from './Page/main';
 import Header from './Components/header/header';
 import styled from 'styled-components';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -17,6 +19,8 @@ const Wrapper = styled.div`
 
 function App() {
   return (
+    <>
+    <ToastContainer/>
     <div className="App">
       <Wrapper id="rootMain">
         <Router>
@@ -28,6 +32,7 @@ function App() {
         </Router>
       </ Wrapper>
     </div>
+    </>
   );
 }
 

@@ -1,0 +1,13 @@
+#modalBox {
+    display: flex;
+    flex-direction: column;
+}
+
+.modalData {
+    margin-top: 10px;
+}
+
+#dataConfirm {
+    width: 100%;
+    margin-top: 30px;
+}

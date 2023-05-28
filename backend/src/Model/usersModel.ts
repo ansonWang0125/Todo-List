@@ -7,14 +7,10 @@ const defineUserModel = (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    email: {
-      type: dataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
     password: {
       type: dataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: '',
     },
   }, { timestamps: true });
 

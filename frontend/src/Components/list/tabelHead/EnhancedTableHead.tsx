@@ -8,10 +8,12 @@ import Box from '@mui/material/Box';
 import { headCells } from '../data/head';
 
 interface Data {
-    name: string,
-    creator: string,
-    dueTime: Date,
-    createTime: Date,
+  taskID: number;
+  task: string;
+  creator: string;
+  createTime: Date;
+  dueTime: Date;
+  state: string;
 }
 
 type Order = 'asc' | 'desc';

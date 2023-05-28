@@ -9,7 +9,7 @@ interface FilterProps {
 }
 
 const options = [
-    "Creater",
+    "Creator",
     "Task"
   ];
 

@@ -16,6 +16,17 @@
     justify-content: center;
 }
 
+#logout{
+    border-radius: 80px;
+    margin-top: 20px;
+    cursor:pointer;
+    border:0 none;
+    height: 40px;
+    font-family: Open Sans;
+    font-size: 17px;
+    width: 100px;
+}
+
 .inputField {
     box-sizing: border-box;
     border: 1px solid #AEAEAE;

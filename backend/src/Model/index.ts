@@ -8,6 +8,7 @@ const dialectValue = process.env.database;
 
 const sequelizeOptions: Options = {
     dialect: dialectValue as Dialect,
+    timezone: '+08:00'
   };
 
 console.log("dialect = ", process.env.database)
